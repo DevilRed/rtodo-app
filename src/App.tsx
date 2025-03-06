@@ -1,3 +1,4 @@
+import { ReactElement } from "react";
 import {
   BrowserRouter as Router,
   Routes,
@@ -23,8 +24,12 @@ const theme = createTheme({
   },
 });
 
+interface PrivateRouteProps {
+  children: ReactElement;
+}
+
 // Protected route component
-function PrivateRoute({ children }) {
+function PrivateRoute({ children }: PrivateRouteProps) {
   const { currentUser } = useAuth();
 
   return currentUser ? children : <Navigate to="/login" />;
