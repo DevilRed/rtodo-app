@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, FormEvent } from "react";
 import { useAuth } from "../context/AuthContext";
 import { Link, useNavigate } from "react-router-dom";
 import {
@@ -19,7 +19,7 @@ export default function Login() {
   const { login } = useAuth();
   const navigate = useNavigate();
 
-  async function handleSubmit(e) {
+  async function handleSubmit(e: FormEvent) {
     e.preventDefault();
 
     try {
@@ -27,7 +27,7 @@ export default function Login() {
       setLoading(true);
       await login(email, password);
       navigate("/");
-    } catch (error) {
+    } catch (error: any) {
       setError("Failed to log in: " + error.message);
     }
 

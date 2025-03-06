@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, FormEvent } from "react";
 import { useAuth } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import {
@@ -12,6 +12,8 @@ import {
   doc,
   onSnapshot,
   serverTimestamp,
+  QueryDocumentSnapshot,
+  DocumentData
 } from "firebase/firestore";
 import { db } from "../firebase";
 import {
@@ -35,11 +37,12 @@ import {
   ToggleButton,
 } from "@mui/material";
 import { Delete, ExitToApp, Add } from "@mui/icons-material";
+import { FilterType, Todo } from "../types";
 
 export default function TodoList() {
-  const [todos, setTodos] = useState([]);
+  const [todos, setTodos] = useState<Todo[]>([]);
   const [newTodo, setNewTodo] = useState("");
-  const [filter, setFilter] = useState("all");
+  const [filter, setFilter] = useState<FilterType>("all");
   const { currentUser, logout } = useAuth();
   const navigate = useNavigate();
 
@@ -58,9 +61,9 @@ export default function TodoList() {
 
     // Listen for realtime updates
     const unsubscribe = onSnapshot(q, (querySnapshot) => {
-      const todosData = [];
-      querySnapshot.forEach((doc) => {
-        todosData.push({ id: doc.id, ...doc.data() });
+      const todosData: Todo[] = [];
+      querySnapshot.forEach((doc: QueryDocumentSnapshot<DocumentData>) => {
+        todosData.push({ id: doc.id, ...doc.data() } as Todo);
       });
       setTodos(todosData);
     });
@@ -68,9 +71,9 @@ export default function TodoList() {
     return unsubscribe;
   }, [currentUser, navigate]);
 
-  const handleAddTodo = async (e) => {
+  const handleAddTodo = async (e: FormEvent) => {
     e.preventDefault();
-    if (newTodo.trim() === "") return;
+    if (newTodo.trim() === "" || !currentUser) return;
 
     await addDoc(collection(db, "todos"), {
       text: newTodo,
@@ -82,13 +85,13 @@ export default function TodoList() {
     setNewTodo("");
   };
 
-  const handleToggleComplete = async (id, completed) => {
+  const handleToggleComplete = async (id: string, completed: boolean) => {
     await updateDoc(doc(db, "todos", id), {
       completed: !completed,
     });
   };
 
-  const handleDeleteTodo = async (id) => {
+  const handleDeleteTodo = async (id: string) => {
     await deleteDoc(doc(db, "todos", id));
   };
 
@@ -101,13 +104,13 @@ export default function TodoList() {
     }
   };
 
-  const handleFilterChange = (e, newFilter) => {
+  const handleFilterChange = (e: React.MouseEvent<HTMLElement>, newFilter: FilterType | null) => {
     if (newFilter !== null) {
       setFilter(newFilter);
     }
   };
 
-  const filteredTodos = todos.filter((todo) => {
+  const filteredTodos = todos.filter((todo: Todo) => {
     if (filter === "active") return !todo.completed;
     if (filter === "completed") return todo.completed;
     return true; // 'all' filter
@@ -177,7 +180,7 @@ export default function TodoList() {
 
           <List>
             {filteredTodos.length > 0 ? (
-              filteredTodos.map((todo) => (
+              filteredTodos.map((todo: Todo) => (
                 <ListItem
                   key={todo.id}
                   secondaryAction={

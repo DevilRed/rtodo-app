@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, FormEvent } from "react";
 import { useAuth } from "../context/AuthContext";
 import { Link, useNavigate } from "react-router-dom";
 import {
@@ -20,7 +20,7 @@ export default function Signup() {
   const { signup } = useAuth();
   const navigate = useNavigate();
 
-  async function handleSubmit(e) {
+  async function handleSubmit(e: FormEvent) {
     e.preventDefault();
 
     if (password !== passwordConfirm) {
@@ -32,7 +32,7 @@ export default function Signup() {
       setLoading(true);
       await signup(email, password);
       navigate("/");
-    } catch (error) {
+    } catch (error: any) {
       setError("Failed to create an account: " + error.message);
     }
 
