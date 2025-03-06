@@ -4,9 +4,10 @@ import {
   signInWithEmailAndPassword,
   signOut,
   onAuthStateChanged,
+  User as FirebaseUser
 } from "firebase/auth";
 import { auth } from "../firebase";
-import { AuthContextType } from "../types";
+import { AuthContextType, User } from "../types";
 
 interface AuthProviderProps {
   children: ReactNode;
@@ -24,7 +25,7 @@ export function useAuth(): AuthContextType {
 }
 
 export function AuthProvider({ children }: AuthProviderProps) {
-  const [currentUser, setCurrentUser] = useState(null);
+  const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
   function signup(email: string, password: string) {
